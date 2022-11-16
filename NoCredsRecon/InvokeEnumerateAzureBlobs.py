@@ -12,7 +12,7 @@ def BaseQuery(base, verbose=False):
 	if(verbose):
 		print("Fetching " + base +".blob.core.windows.net" )
 	try:
-		result = resolver.resolve(rdtype="A_AAAA" ,  qname=base+".blob.core.windows.net·" , raise_on_no_answer=False )
+		result = resolver.resolve(rdtype="A" ,  qname=base+".blob.core.windows.net·" , raise_on_no_answer=False )
 		if(result):
 			final_table.append("Found Storage Account "+ base +".blob.core.windows.net" )
 	except:
