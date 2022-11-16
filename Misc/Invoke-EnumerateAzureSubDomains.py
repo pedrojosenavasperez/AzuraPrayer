@@ -1,5 +1,7 @@
 from dns import resolver
 from tabulate import tabulate
+from threading import Thread
+
 
 
 # Enumerate azure public subdomains
@@ -34,7 +36,7 @@ def BaseQuery(base, verbose=False):
 			if(verbose):
 				print("Enumerating " + base +" subdomains for "+ i )
 			try:
-				#Thats doesnt work for MX register
+				#Thats doesnt work for MX authoritative responses
 				result = resolver.resolve(rdtype=register_type ,  qname=base+"."+i , raise_on_no_answer=False )
 				if(result):
 					final_table.append([subdomains[i], base+"."+i ])
@@ -55,10 +57,13 @@ def EnumerateAzureSubDomains ( base="" , permutations="permutations.txt" , verbo
 		try:
 			with open(permutations) as permutations_file:
 				for line in permutations_file:
-					BaseQuery(line+base)
-					BaseQuery(base+line)
+					thread1 = Thread(target=BaseQuery(line+base))
+					thread1.start()
+					thread = Thread(target=BaseQuery(base+line))
+					thread2.start()					
 		except:
 			print("Invalid permutation file.")
 
 
 		print(tabulate(final_table, headers=['Service', 'URL'], tablefmt='fancy_grid'))
+		return final_table
