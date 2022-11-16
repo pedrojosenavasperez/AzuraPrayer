@@ -27,18 +27,18 @@ subdomains = {	"onmicrosoft.com" : "Microsoft Hosted Domain",
 
 
 def BaseQuery(base, verbose=False):
-		for i in subdomains:
-			for register_type in register_types:
-				if(verbose):
-					print("Enumerating " + base +" subdomains for "+ i )
-				try:
-					#Thats doesnt work for MX register
-					result = resolver.resolve(rdtype=register_type ,  qname=base+"."+i , raise_on_no_answer=False )
-					if(result):
-						print(subdomains[i] + ":                   " + base+"."+i )
-						break
-				except:
-					pass
+	for i in subdomains:
+		for register_type in register_types:
+			if(verbose):
+				print("Enumerating " + base +" subdomains for "+ i )
+			try:
+				#Thats doesnt work for MX register
+				result = resolver.resolve(rdtype=register_type ,  qname=base+"."+i , raise_on_no_answer=False )
+				if(result):
+					print(subdomains[i] + ":                   " + base+"."+i )
+					break
+			except:
+				pass
 
 	
 
@@ -57,4 +57,6 @@ def EnumerateAzureSubDomains ( base="" , permutations="permutations.txt" , verbo
 					BaseQuery(base+line)
 		except:
 			print("Invalid permutation file.")
+
+
 
