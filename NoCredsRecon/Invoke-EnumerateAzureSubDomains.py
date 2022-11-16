@@ -2,8 +2,7 @@ from dns import resolver
 from tabulate import tabulate
 from threading import Thread
 
-
-
+# Based on https://github.com/NetSPI/MicroBurst/blob/master/Misc/Invoke-EnumerateAzureSubDomains.ps1
 # Enumerate azure public subdomains
 # The function will check for valid Azure subdomains, based off of a base word, via DNS. 
 
