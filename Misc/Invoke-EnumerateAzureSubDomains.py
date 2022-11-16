@@ -1,4 +1,5 @@
 from dns import resolver
+from tabulate import tabulate
 
 
 # Enumerate azure public subdomains
@@ -24,6 +25,7 @@ subdomains = {	"onmicrosoft.com" : "Microsoft Hosted Domain",
 				"search.windows.net" : "Search Appliance",
 				"azure-api.net" : "API Services",
 				"azurecr.io" : "Azure Container Registry"}
+final_table = []
 
 
 def BaseQuery(base, verbose=False):
@@ -35,7 +37,7 @@ def BaseQuery(base, verbose=False):
 				#Thats doesnt work for MX register
 				result = resolver.resolve(rdtype=register_type ,  qname=base+"."+i , raise_on_no_answer=False )
 				if(result):
-					print(subdomains[i] + ":                   " + base+"."+i )
+					final_table.append([subdomains[i], base+"."+i ])
 					break
 			except:
 				pass
@@ -59,4 +61,4 @@ def EnumerateAzureSubDomains ( base="" , permutations="permutations.txt" , verbo
 			print("Invalid permutation file.")
 
 
-
+		print(tabulate(final_table, headers=['Service', 'URL'], tablefmt='fancy_grid'))
