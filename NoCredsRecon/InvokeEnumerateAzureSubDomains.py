@@ -4,7 +4,7 @@ from threading import Thread
 
 # Based on https://github.com/NetSPI/MicroBurst/blob/master/Misc/Invoke-EnumerateAzureSubDomains.ps1
 # Enumerate azure public subdomains
-# The function will check for valid Azure subdomains, based off of a base word, via DNS. 
+# The function will check for valid Azure subdomains, based on a base word, via DNS. 
 
 register_types = ["A","AAAA","MX"]
 subdomains = {	"onmicrosoft.com" : "Microsoft Hosted Domain",
@@ -38,13 +38,13 @@ def threadable(register_type ,  fulldomain ,subdomain):
 
 def BaseQuery(base, verbose=False):
 	threads = []
-	for i in subdomains:
+	for subdomain in subdomains:
 		for register_type in register_types:
 			if(verbose):
-				print("Enumerating " + base +" subdomains for "+ i )
+				print("Enumerating " + base +" subdomains for "+ subdomain )
 			try:
 				#Thats doesnt work for MX register with authoritative answer
-				arguments = {"register_type":register_type , "fulldomain":base+"."+i, "subdomain":subdomains[i]}
+				arguments = {"register_type":register_type , "fulldomain":base+"."+subdomain, "subdomain":subdomains[subdomain]}
 				thread = Thread(target=threadable, kwargs=arguments)
 				threads.append(thread)
 				thread.start()
@@ -56,14 +56,10 @@ def BaseQuery(base, verbose=False):
 	for thread in threads:
 		thread.join()
 
-	
-
-
 def EnumerateAzureSubDomains( base="" , permutations="" , verbose=False):
 	if(base==""):
 		print("Not base name especified.")
 	else:
-
 		BaseQuery(base,verbose)
 
 		try:
