@@ -26,13 +26,11 @@ subdomains = {	"onmicrosoft.com" : "Microsoft Hosted Domain",
 				"search.windows.net" : "Search Appliance",
 				"azure-api.net" : "API Services",
 				"azurecr.io" : "Azure Container Registry"}
-final_table = []
 
 def threadable(register_type ,  fulldomain ,subdomain):
 	try:
 		result = resolver.resolve(rdtype=register_type ,  qname=fulldomain , raise_on_no_answer=False )
 		if(result):
-			table = [ subdomain, fulldomain]
 			print("Found url for " + subdomain +" at: " + fulldomain)
 	except:
 		pass
@@ -45,7 +43,7 @@ def BaseQuery(base, verbose=False):
 			if(verbose):
 				print("Enumerating " + base +" subdomains for "+ i )
 			try:
-				#Thats doesnt work for MX register
+				#Thats doesnt work for MX register with authoritative answer
 				arguments = {"register_type":register_type , "fulldomain":base+"."+i, "subdomain":subdomains[i]}
 				thread = Thread(target=threadable, kwargs=arguments)
 				threads.append(thread)
@@ -66,17 +64,14 @@ def EnumerateAzureSubDomains( base="" , permutations="" , verbose=False):
 		print("Not base name especified.")
 	else:
 
-		BaseQuery(base)
+		BaseQuery(base,verbose)
 
 		try:
 			with open(permutations) as permutations_file:
 				for line in permutations_file:
 					line_strip = line.rstrip()
-					BaseQuery(line_strip+base)
-					BaseQuery(base+line_strip)
+					BaseQuery(line_strip+base,verbose)
+					BaseQuery(base+line_strip,verbose)
 		except:
 			print("Invalid permutation file.")
-
-	return final_table
-
 
