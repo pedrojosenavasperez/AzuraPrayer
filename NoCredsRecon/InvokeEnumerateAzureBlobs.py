@@ -1,58 +1,64 @@
 from dns import resolver
-from tabulate import tabulate
+import requests
+from threading import Thread
 
-# Based on https://github.com/NetSPI/MicroBurst/blob/master/Misc/Invoke-EnumerateAzureSubDomains.ps1
-# Enumerate public Azure Blobs and Containers.
-# The function will check for valid .blob.core.windows.net host names via DNS
+# Based on https://github.com/NetSPI/MicroBurst/blob/master/Misc/Invoke-EnumerateAzureBlobs.ps1
+# This code is used to enumerate public Azure Blobs and Containers. 
+# The code first attempts to resolve the DNS query of a given base name with the ".blob.core.windows.net" suffix. 
+# If the DNS query is successful, the base name is then added to the valid_domains list. 
+# The GetBlob function will then make a request to the specified domain and folder and, if successful, print the URL of the folder and its contents. 
+# Finally, the EnumerateAzureBlobs function will iterate through the specified list of folders and will create a thread for each folder with the specified domain.
 
+valid_domains =[]
 
-final_table=[]
-
-def BaseQuery(base, verbose=False):
+def baseQuery(base, verbose=False):
 	if(verbose):
 		print("Fetching " + base +".blob.core.windows.net" )
+
 	try:
-		result = resolver.resolve(rdtype="A" ,  qname=base+".blob.core.windows.net·" , raise_on_no_answer=False )
+		result = resolver.resolve(rdtype="A" ,  qname=base+".blob.core.windows.net" , raise_on_no_answer=False )
 		if(result):
-			final_table.append("Found Storage Account "+ base +".blob.core.windows.net" )
+			valid_domains.append(base +".blob.core.windows.net")
+
 	except:
 			pass
 
 
-def EnumerateAzureBlobs(base="" , permutations="permutations.txt" , verbose=False , folders="permutations.txt" , OutputFile="" , BingAPIKey=""):
+def getBlob(domain, folder , verbose=False):
+	uri = "https://" + domain + "/" + folder + "?restype=container"
+	response = requests.get(uri)
+	if(response.status_code == 200):
+		urilist = "https://" + domain + "/" + folder + "?restype=container&comp=list"
+		print("Found folder " + folder +" at " + domain + " you can try to see the list of files at " + urilist)
+		
+
+
+def enumerateAzureBlobs(base="" , verbose=False , folders="permutations.txt" ): # , OutputFile="" , BingAPIKey=""):
 	domain = '.blob.core.windows.net'
 	if(base==""):
 		print("Not base name especified.")
 	else:
 
-		BaseQuery(base)
+		baseQuery(base)
 
-		try:
-			with open(permutations) as permutations_file:
-				for line in permutations_file:
-					line_strip = line.rstrip()
-					BaseQuery(line_strip+base)
-					BaseQuery(base+line_strip)
-		except:
-			print("Invalid permutation file.")
-		
-		print(tabulate(final_table, headers=['Findings'], tablefmt='fancy_grid'))
+		#if(BingAPIKey != ""):
+		#	BingQuery = "site:blob.core.windows.net "+ Base
+		#	# To DO implement this
 
-		if(verbose):
-				print("DNS bruteforce finished , starting container enumeration")
+		threads = []
 
-		if(BingAPIKey != ""):
-			BingQuery = "site:blob.core.windows.net "+ Base
-			# To DO implement this
-
-		for domain in final_table:
+		for domain in valid_domains:
 			try:
-				with open(permutations) as permutations_file:
-					for line in permutations_file:
-						line_strip = line.rstrip()
-						BaseQuery(line_strip+base)
-						BaseQuery(base+line_strip)
+				with open(folders) as folders_file:
+					for line in folders_file:
+						arguments = {"domain":domain , "folder":line.strip() , "verbose":verbose}
+						thread = Thread(target=getBlob, kwargs=arguments)
+						threads.append(thread)
+						thread.start()
 			except:
-				print("Invalid permutation file.")
+				if(verbose):
+					print("Invalid folders file.")
 				
+		for thread in threads:
+			thread.join()
 
