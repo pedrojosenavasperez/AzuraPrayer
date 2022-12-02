@@ -1,4 +1,3 @@
-
 # AzuraPrayer
 
 AzuraPrayer is a collection of Azure Pentesting scripts translated outside of MicroSoft ecosystem (**No powershell on my house**). This library of tools includes scripts to help in the testing of Azure cloud environments.
