@@ -3,9 +3,9 @@ from tabulate import tabulate
 from threading import Thread
 
 # Based on https://github.com/NetSPI/MicroBurst/blob/master/Misc/Invoke-EnumerateAzureSubDomains.ps1
-# Enumerate azure public subdomains
-# The function will check for valid Azure subdomains, based on a base word, via DNS. 
-
+# This code is used to enumerate subdomains for Microsoft Azure services. 
+# The `threadable` function attempts to resolve the full domain, and if successful it prints a message. 
+# The `baseQuery` function takes the domain to use in the subdomain search and creates threads to search the subdomain.
 register_types = ["A","AAAA","MX"]
 subdomains = {	"onmicrosoft.com" : "Microsoft Hosted Domain",
 				"scm.azurewebsites.net" : "App Services - Management",
@@ -36,7 +36,7 @@ def threadable(register_type ,  fulldomain ,subdomain):
 		pass
 
 
-def BaseQuery(base, verbose=False):
+def baseQuery(base, verbose=False):
 	threads = []
 	for subdomain in subdomains:
 		for register_type in register_types:
@@ -56,18 +56,18 @@ def BaseQuery(base, verbose=False):
 	for thread in threads:
 		thread.join()
 
-def EnumerateAzureSubDomains( base="" , permutations="" , verbose=False):
+def enumerateAzureSubDomains( base="" , permutations="" , verbose=False):
 	if(base==""):
 		print("Not base name especified.")
 	else:
-		BaseQuery(base,verbose)
+		baseQuery(base,verbose)
 
 		try:
 			with open(permutations) as permutations_file:
 				for line in permutations_file:
 					line_strip = line.rstrip()
-					BaseQuery(line_strip+base,verbose)
-					BaseQuery(base+line_strip,verbose)
+					baseQuery(line_strip+base,verbose)
+					baseQuery(base+line_strip,verbose)
 		except:
 			print("Invalid permutation file.")
 
