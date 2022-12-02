@@ -1,5 +1,5 @@
 import InvokeEnumerateAzureSubDomains
 import InvokeEnumerateAzureBlobs
 
-InvokeEnumerateAzureSubDomains.EnumerateAzureSubDomains("retailcorp")
-#InvokeEnumerateAzureBlobs.EnumerateAzureBlobs("retailcorp","")
+InvokeEnumerateAzureSubDomains.enumerateAzureSubDomains("retailcorp","permutations.txt")
+InvokeEnumerateAzureBlobs.enumerateAzureBlobs("retailcorp")
