@@ -33,17 +33,13 @@ def getBlob(domain, folder , verbose=False):
 		
 
 
-def enumerateAzureBlobs(base="" , verbose=False , folders="permutations.txt" ): # , OutputFile="" , BingAPIKey=""):
+def enumerateAzureBlobs(base="" , verbose=False , folders="folders.txt" ):
 	domain = '.blob.core.windows.net'
 	if(base==""):
 		print("Not base name especified.")
 	else:
 
 		baseQuery(base)
-
-		#if(BingAPIKey != ""):
-		#	BingQuery = "site:blob.core.windows.net "+ Base
-		#	# To DO implement this
 
 		threads = []
 
